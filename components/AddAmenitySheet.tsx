@@ -1,5 +1,7 @@
 "use client";
 
+import { ImageUploader } from "@/components/images/ImageUploader";
+import { useImageUpload } from "@/lib/hooks/useImageUpload";
 import { Category } from "@/types/amenity";
 import { useState } from "react";
 
@@ -14,7 +16,7 @@ interface AddAmenitySheetProps {
     description?: string;
     lat: number;
     lng: number;
-  }) => Promise<{ success: boolean; error?: string }>;
+  }) => Promise<{ success: boolean; amenityId?: string; error?: string }>;
 }
 
 export default function AddAmenitySheet({
@@ -29,6 +31,16 @@ export default function AddAmenitySheet({
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const {
+    images,
+    addImages,
+    removeImage,
+    uploadImages,
+    clearImages,
+    isUploading,
+    canAddMore,
+  } = useImageUpload({ maxImages: 5 });
 
   const selectedCategory = categories.find((c) => c.id === categoryId);
 
@@ -50,6 +62,7 @@ export default function AddAmenitySheet({
     setSubmitting(true);
     setError(null);
 
+    // 1. Create amenity first
     const result = await onSubmit({
       category_id: categoryId,
       name: name.trim(),
@@ -58,17 +71,56 @@ export default function AddAmenitySheet({
       lng: selectedLocation.lng,
     });
 
+    if (!result.success || !result.amenityId) {
+      setError(result.error || "Failed to add amenity");
+      setSubmitting(false);
+      return;
+    }
+
+    // 2. Upload images if any
+    const pendingImages = images.filter((img) => img.status === "pending");
+    if (pendingImages.length > 0) {
+      const uploadedImages = await uploadImages(result.amenityId);
+
+      if (uploadedImages.length > 0) {
+        // 3. Confirm uploads
+        const imagesToConfirm = uploadedImages
+          .filter((img) => img.r2Key && img.cdnUrl)
+          .map((img, index) => ({
+            r2Key: img.r2Key!,
+            cdnUrl: img.cdnUrl!,
+            filename: img.file.name,
+            contentType: img.file.type,
+            fileSize: img.file.size,
+            displayOrder: index,
+          }));
+
+        if (imagesToConfirm.length > 0) {
+          try {
+            await fetch("/api/images/confirm", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                amenityId: result.amenityId,
+                images: imagesToConfirm,
+              }),
+            });
+          } catch (uploadError) {
+            console.error("Failed to confirm image uploads:", uploadError);
+            // Continue anyway - amenity was created successfully
+          }
+        }
+      }
+    }
+
     setSubmitting(false);
 
-    if (result.success) {
-      // Reset form
-      setCategoryId("");
-      setName("");
-      setDescription("");
-      onClose();
-    } else {
-      setError(result.error || "Failed to add amenity");
-    }
+    // Reset form
+    setCategoryId("");
+    setName("");
+    setDescription("");
+    clearImages();
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -200,6 +252,18 @@ export default function AddAmenitySheet({
               </p>
             </div>
 
+            {/* Image Upload */}
+            <div className="mb-5">
+              <ImageUploader
+                images={images}
+                onAddImages={addImages}
+                onRemoveImage={removeImage}
+                isUploading={isUploading}
+                canAddMore={canAddMore}
+                maxImages={5}
+              />
+            </div>
+
             {/* Error Message */}
             {error && (
               <div className="mb-4 flex items-center gap-2 rounded-xl bg-red-50 px-4 py-3 animate-scale-in">
@@ -233,14 +297,18 @@ export default function AddAmenitySheet({
               <button
                 type="submit"
                 disabled={
-                  submitting || !selectedLocation || !categoryId || !name.trim()
+                  submitting ||
+                  isUploading ||
+                  !selectedLocation ||
+                  !categoryId ||
+                  !name.trim()
                 }
                 className="btn btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submitting ? (
+                {submitting || isUploading ? (
                   <>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    Adding...
+                    {isUploading ? "Uploading..." : "Adding..."}
                   </>
                 ) : (
                   <>

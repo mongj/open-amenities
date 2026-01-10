@@ -106,23 +106,23 @@ export function useAmenities() {
     lat: number
     lng: number
     address?: string
-  }) => {
+  }): Promise<{ success: boolean; amenityId?: string; error?: string }> => {
     try {
-      const { error } = await supabase.from('amenities').insert({
+      const { data, error } = await supabase.from('amenities').insert({
         category_id: amenity.category_id,
         name: amenity.name,
         description: amenity.description || null,
         location: `POINT(${amenity.lng} ${amenity.lat})`,
         address: amenity.address || null,
         status: 'approved',
-      })
+      }).select('id').single()
 
       if (error) throw error
 
       // Refetch all amenities to include the new one
       await refetch()
 
-      return { success: true }
+      return { success: true, amenityId: data.id }
     } catch (err) {
       return {
         success: false,

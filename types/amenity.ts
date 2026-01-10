@@ -9,6 +9,20 @@ export interface Category {
   description: string | null
 }
 
+export interface AmenityImage {
+  id: string
+  amenity_id: string
+  r2_key: string
+  cdn_url: string
+  filename: string
+  content_type: string
+  file_size: number
+  width: number | null
+  height: number | null
+  display_order: number
+  created_at: string
+}
+
 export interface Amenity {
   id: string
   name: string
@@ -23,6 +37,8 @@ export interface Amenity {
   category_icon: string
   category_color: string
   created_at: string
+  image_count?: number
+  primary_image_url?: string | null
 }
 
 export interface MapBounds {
