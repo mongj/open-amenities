@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const MAX_IMAGES_PER_AMENITY = 5
+const MAX_IMAGES_PER_AMENITY = 3
 
 // Use service role key for server-side operations
 const supabase = createClient(

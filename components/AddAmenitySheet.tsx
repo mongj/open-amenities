@@ -40,7 +40,20 @@ export default function AddAmenitySheet({
     clearImages,
     isUploading,
     canAddMore,
-  } = useImageUpload({ maxImages: 5 });
+  } = useImageUpload({ maxImages: 3 });
+
+  const resetForm = () => {
+    setCategoryId("");
+    setName("");
+    setDescription("");
+    setError(null);
+    clearImages();
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
 
   const selectedCategory = categories.find((c) => c.id === categoryId);
 
@@ -115,12 +128,7 @@ export default function AddAmenitySheet({
 
     setSubmitting(false);
 
-    // Reset form
-    setCategoryId("");
-    setName("");
-    setDescription("");
-    clearImages();
-    onClose();
+    handleClose();
   };
 
   if (!isOpen) return null;
@@ -130,7 +138,7 @@ export default function AddAmenitySheet({
       {/* Backdrop with blur */}
       <div
         className="fixed inset-0 z-40 bg-stone-900/40 backdrop-blur-sm transition-opacity animate-fade-in"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Sheet */}
@@ -260,7 +268,7 @@ export default function AddAmenitySheet({
                 onRemoveImage={removeImage}
                 isUploading={isUploading}
                 canAddMore={canAddMore}
-                maxImages={5}
+                maxImages={3}
               />
             </div>
 
@@ -289,7 +297,7 @@ export default function AddAmenitySheet({
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="btn btn-secondary flex-1"
               >
                 Cancel
