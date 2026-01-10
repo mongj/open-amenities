@@ -306,15 +306,17 @@ h1, h2, h3, h4, h5, h6, .font-display {
 }
 
 .mapboxgl-popup-close-button {
-  font-size: 20px !important;
-  padding: 8px 12px !important;
-  color: var(--stone-400) !important;
-  transition: color 0.15s ease;
+  display: none !important;
 }
 
-.mapboxgl-popup-close-button:hover {
+/* Amenity popup specific styles */
+.amenity-popup .mapboxgl-popup-content {
+  position: relative;
+  padding: 0 !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
   background: transparent !important;
-  color: var(--stone-900) !important;
+  overflow: visible;
 }
 
 .mapboxgl-popup-tip {

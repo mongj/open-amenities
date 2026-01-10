@@ -12,6 +12,7 @@ import {
   Popup,
   type MapRef,
 } from "react-map-gl/mapbox";
+import AmenityPopup from "./AmenityPopup";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -147,83 +148,15 @@ export default function Map({
           latitude={selectedAmenity.lat}
           anchor="bottom"
           onClose={onClosePopup}
-          closeOnClick={false}
+          closeOnClick={true}
           offset={44}
           closeButton={false}
+          className="amenity-popup"
         >
-          <div className="min-w-56 max-w-72">
-            {/* Header with category */}
-            <div
-              className="px-4 py-3"
-              style={{
-                backgroundColor: `${
-                  selectedAmenity.category_color || "#E07A5F"
-                }15`,
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <div
-                  className="flex h-8 w-8 items-center justify-center rounded-lg"
-                  style={{
-                    backgroundColor: `${
-                      selectedAmenity.category_color || "#E07A5F"
-                    }25`,
-                  }}
-                >
-                  <span className="text-lg">
-                    {selectedAmenity.category_icon}
-                  </span>
-                </div>
-                <span
-                  className="text-xs font-semibold uppercase tracking-wide"
-                  style={{ color: selectedAmenity.category_color || "#E07A5F" }}
-                >
-                  {selectedAmenity.category_name}
-                </span>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="p-4">
-              <h3 className="font-display text-base font-semibold text-stone-900 leading-snug">
-                {selectedAmenity.name}
-              </h3>
-
-              {selectedAmenity.description && (
-                <p className="mt-2 text-sm text-stone-600 leading-relaxed">
-                  {selectedAmenity.description}
-                </p>
-              )}
-
-              {selectedAmenity.address && (
-                <div className="mt-3 flex items-start gap-2">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="mt-0.5 shrink-0 text-stone-400"
-                  >
-                    <path d="M12 2a8 8 0 0 0-8 8c0 5.4 7 11 8 12 1-1 8-6.6 8-12a8 8 0 0 0-8-8Z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                  <p className="text-xs text-stone-500 leading-relaxed">
-                    {selectedAmenity.address}
-                  </p>
-                </div>
-              )}
-
-              {/* Close button */}
-              <button
-                onClick={onClosePopup}
-                className="mt-3 w-full rounded-lg bg-stone-100 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-200"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+          <AmenityPopup
+            amenity={selectedAmenity}
+            onClose={onClosePopup ?? (() => {})}
+          />
         </Popup>
       )}
     </MapGL>
