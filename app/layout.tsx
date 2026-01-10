@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { Toaster } from "sonner";
 
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -59,6 +60,7 @@ export default function RootLayout({
       <body className={`${bricolage.variable} ${dmSans.variable}`}>
         {children}
         <ServiceWorkerRegistration />
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

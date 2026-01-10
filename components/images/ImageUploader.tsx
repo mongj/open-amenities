@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
-import { useRef, useCallback } from 'react'
-import { UploadedImage } from '@/lib/hooks/useImageUpload'
+import { UploadedImage } from "@/lib/hooks/useImageUpload";
+import { useCallback, useRef } from "react";
 
 interface ImageUploaderProps {
-  images: UploadedImage[]
-  onAddImages: (files: FileList | File[]) => void
-  onRemoveImage: (id: string) => void
-  isUploading: boolean
-  canAddMore: boolean
-  maxImages?: number
+  images: UploadedImage[];
+  onAddImages: (files: FileList | File[]) => void;
+  onRemoveImage: (id: string) => void;
+  isUploading: boolean;
+  canAddMore: boolean;
+  maxImages?: number;
 }
 
 export function ImageUploader({
@@ -20,42 +20,45 @@ export function ImageUploader({
   canAddMore,
   maxImages = 5,
 }: ImageUploaderProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
-      e.preventDefault()
-      if (!canAddMore) return
-      const files = e.dataTransfer.files
+      e.preventDefault();
+      if (!canAddMore) return;
+      const files = e.dataTransfer.files;
       if (files.length > 0) {
-        onAddImages(files)
+        onAddImages(files);
       }
     },
     [canAddMore, onAddImages]
-  )
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-  }, [])
+    e.preventDefault();
+  }, []);
 
   const handleFileSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files
+      const files = e.target.files;
       if (files && files.length > 0) {
-        onAddImages(files)
+        onAddImages(files);
       }
       // Reset input
       if (inputRef.current) {
-        inputRef.current.value = ''
+        inputRef.current.value = "";
       }
     },
     [onAddImages]
-  )
+  );
 
   return (
     <div className="space-y-3">
       <label className="mb-2 block text-sm font-medium text-stone-700">
-        Photos <span className="font-normal text-stone-400">(optional, max {maxImages})</span>
+        Photos{" "}
+        <span className="font-normal text-stone-400">
+          (optional, max {maxImages})
+        </span>
       </label>
 
       {/* Image Preview Grid */}
@@ -64,7 +67,7 @@ export function ImageUploader({
           {images.map((image) => (
             <div
               key={image.id}
-              className="relative aspect-square rounded-xl overflow-hidden bg-stone-100"
+              className="relative aspect-square rounded-md overflow-hidden bg-stone-100"
             >
               {image.preview && (
                 /* eslint-disable-next-line @next/next/no-img-element */
@@ -76,14 +79,14 @@ export function ImageUploader({
               )}
 
               {/* Status overlay - uploading */}
-              {image.status === 'uploading' && (
+              {image.status === "uploading" && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                   <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                 </div>
               )}
 
               {/* Status overlay - error */}
-              {image.status === 'error' && (
+              {image.status === "error" && (
                 <div className="absolute inset-0 flex items-center justify-center bg-red-500/80">
                   <svg
                     width="24"
@@ -101,7 +104,7 @@ export function ImageUploader({
               )}
 
               {/* Status overlay - uploaded checkmark */}
-              {image.status === 'uploaded' && (
+              {image.status === "uploaded" && (
                 <div className="absolute bottom-1 right-1 rounded-full bg-green-500 p-1">
                   <svg
                     className="h-3 w-3 text-white"
@@ -124,7 +127,7 @@ export function ImageUploader({
                 <button
                   type="button"
                   onClick={() => onRemoveImage(image.id)}
-                  className="absolute right-1 top-1 rounded-full bg-black/60 p-1.5 text-white transition-colors hover:bg-black/80"
+                  className="absolute right-1.5 top-1.5 cursor-pointer rounded-full bg-black/60 p-1.5 text-white transition-colors hover:bg-black/80"
                 >
                   <svg
                     width="12"
@@ -149,7 +152,7 @@ export function ImageUploader({
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={() => inputRef.current?.click()}
-          className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stone-300 bg-stone-50 p-6 transition-colors hover:border-coral hover:bg-coral/5"
+          className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-stone-300 bg-stone-50 p-6 transition-colors hover:border-coral hover:bg-coral/5"
         >
           <svg
             width="32"
@@ -178,7 +181,9 @@ export function ImageUploader({
       />
 
       {/* Hint text */}
-      <p className="text-xs text-stone-400">JPEG, PNG, or WebP. Max 5MB per image.</p>
+      <p className="text-xs text-stone-400">
+        JPEG, PNG, or WebP. Max 5MB per image.
+      </p>
     </div>
-  )
+  );
 }
